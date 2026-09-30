@@ -111,7 +111,9 @@ def normalize_for_json(obj):
     return _norm(obj)
 
 #TOPIC Export recursivo
-def export_collection_recursive(db: firestore.Client, collection_path: str) -> dict:
+def export_collection_recursive(
+    db: firestore.Client, collection_path: str, include_subcollections: bool = True
+) -> dict:
     """
     Exporta todos os documentos de `collection_path` e, para cada documento,
     todas as subcoleções (recursivamente).
@@ -123,10 +125,10 @@ def export_collection_recursive(db: firestore.Client, collection_path: str) -> d
         doc_data = doc_snap.to_dict() or {}
         sub_out: dict[str, dict] = {}
 
-        # Lista subcoleções do documento atual
-        for subcol_ref in doc_snap.reference.collections():
-            sub_path = f"{collection_path}/{doc_snap.id}/{subcol_ref.id}"
-            sub_out[subcol_ref.id] = export_collection_recursive(db, sub_path)
+        if include_subcollections:
+            for subcol_ref in doc_snap.reference.collections():
+                sub_path = f"{collection_path}/{doc_snap.id}/{subcol_ref.id}"
+                sub_out[subcol_ref.id] = export_collection_recursive(db, sub_path, include_subcollections=True)
 
         if sub_out:
             doc_data["__collections__"] = sub_out
@@ -167,8 +169,15 @@ def main():
     # Firestore client
     db = get_firestore_client()
 
+    include_subcollections = os.getenv("EXPORT_SUBCOLLECTIONS", "true").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "sim",
+    }
+
     # Exporta e normaliza
-    data = {root: export_collection_recursive(db, root)}
+    data = {root: export_collection_recursive(db, root, include_subcollections=include_subcollections)}
     data = normalize_for_json(data)
 
     # Caminho de saída (cria pastas se necessário)

@@ -39,6 +39,7 @@ def run_export() -> tuple[bool, str]:
         "OUT_FILE",
         "ROOT_COLLECTION",
         "FIRESTORE_TRANSPORT",
+        "EXPORT_SUBCOLLECTIONS",
     )
 
     try:
@@ -49,6 +50,7 @@ def run_export() -> tuple[bool, str]:
         pass
 
     process_env.setdefault("FIRESTORE_TRANSPORT", "rest")
+    process_env.setdefault("EXPORT_SUBCOLLECTIONS", "false")
 
     try:
         result = subprocess.run(
