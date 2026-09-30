@@ -121,7 +121,7 @@ def export_collection_recursive(
     out: dict[str, dict] = {}
     col_ref = db.collection(collection_path)
 
-    for doc_snap in col_ref.stream():
+    for doc_snap in col_ref.stream(retry=None, timeout=900):
         doc_data = doc_snap.to_dict() or {}
         sub_out: dict[str, dict] = {}
 
