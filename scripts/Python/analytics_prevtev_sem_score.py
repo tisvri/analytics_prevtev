@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from datetime import date, datetime, timedelta
@@ -22,13 +23,41 @@ st.set_page_config(page_title="Analytics PREVTEV - Itens 1 a 3", layout="wide")
 
 
 def run_export() -> tuple[bool, str]:
+    process_env = os.environ.copy()
+    secret_names = (
+        "TYPE",
+        "PROJECT_ID",
+        "PRIVATE_KEY_ID",
+        "PRIVATE_KEY",
+        "CLIENT_EMAIL",
+        "CLIENT_ID",
+        "AUTH_URI",
+        "TOKEN_URI",
+        "AUTH_PROVIDER_X509_CERT_URL",
+        "CLIENT_X509_CERT_URL",
+        "UNIVERSE_DOMAIN",
+        "OUT_FILE",
+        "ROOT_COLLECTION",
+        "FIRESTORE_TRANSPORT",
+    )
+
+    try:
+        for name in secret_names:
+            if name in st.secrets:
+                process_env[name] = str(st.secrets[name])
+    except Exception:  # noqa: BLE001
+        pass
+
+    process_env.setdefault("FIRESTORE_TRANSPORT", "rest")
+
     try:
         result = subprocess.run(
             [sys.executable, str(EXPORT_SCRIPT)],
             cwd=PROJECT_ROOT,
+            env=process_env,
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=900,
         )
         if result.returncode != 0:
             return False, result.stderr or result.stdout
