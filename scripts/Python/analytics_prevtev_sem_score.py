@@ -49,7 +49,7 @@ def run_export() -> tuple[bool, str]:
     except Exception:  # noqa: BLE001
         pass
 
-    process_env.setdefault("FIRESTORE_TRANSPORT", "rest")
+    process_env["FIRESTORE_TRANSPORT"] = "grpc"
     process_env.setdefault("EXPORT_SUBCOLLECTIONS", "false")
 
     try:
