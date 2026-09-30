@@ -16,6 +16,8 @@ from google.oauth2 import service_account
 from google.cloud import firestore
 from google.api_core.datetime_helpers import DatetimeWithNanoseconds
 from google.cloud.firestore_v1 import DocumentReference, GeoPoint # type: ignore
+from google.cloud.firestore_v1.services.firestore import FirestoreClient
+from google.cloud.firestore_v1.services.firestore.transports import FirestoreRestTransport
 
 
 
@@ -61,21 +63,18 @@ def build_credentials_from_env():
 
 
 def get_firestore_client():
-    """Inicializa o cliente do Firestore.
-    Tenta usar 'transport' se disponível; caso a versão não suporte, faz fallback.
-    """
+    """Inicializa o cliente do Firestore usando REST por padrão."""
     creds, project_id = build_credentials_from_env()
 
-    transport = os.getenv("FIRESTORE_TRANSPORT")  # ex.: "rest" ou "grpc"
-    if transport:
-        try:
-            # Em versões mais novas isso funciona
-            return firestore.Client(project=project_id, credentials=creds, transport=transport)
-        except TypeError:
-            # Versões antigas não aceitam 'transport' → ignora
-            pass
+    transport = (os.getenv("FIRESTORE_TRANSPORT") or "rest").strip().lower()
+    if transport not in {"rest", "grpc"}:
+        raise ValueError("FIRESTORE_TRANSPORT deve ser 'rest' ou 'grpc'.")
 
-    # Fallback compatível com todas as versões
+    if transport == "rest":
+        client = firestore.Client(project=project_id, credentials=creds)
+        client._firestore_api_internal = FirestoreClient(transport=FirestoreRestTransport(credentials=creds))
+        return client
+
     return firestore.Client(project=project_id, credentials=creds)
 
 
