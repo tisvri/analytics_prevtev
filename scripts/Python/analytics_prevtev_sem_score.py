@@ -9,6 +9,7 @@ from datetime import date, datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 
+import base64
 import pandas as pd
 import streamlit as st
 
@@ -19,7 +20,92 @@ CALCULADORAS = ["SCORE Caprini", "Padua", "Improve", "ImproveDD", "RCOG"]
 PRESETS_PERIODO = ["Todo o período", "Esta semana", "Este mês", "Mês anterior", "Este ano", "Personalizado"]
 
 
-st.set_page_config(page_title="Analytics PREVTEV - Itens 1 a 3", layout="wide")
+st.set_page_config(
+    page_title="Analytics PREVTEV - Itens 1 a 3", 
+    layout="wide", 
+    page_icon = "📊",
+    initial_sidebar_state='collapsed'
+    
+)
+
+def get_image_base64(path_to_image: str) -> str:
+    
+    path = Path(path_to_image)
+    if not path.is_file():
+        return ""
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+logo_svri_esq_b64_light = get_image_base64("img/logo_svri_fundo_branco.png")
+logo_svri_esq_b64_dark = get_image_base64("img/logo_svri_fundo_preto.png")
+logo_prevtev_dir_b64 = get_image_base64("img/logo_prevtev_sem_bg.png")
+
+
+
+st.markdown(
+    f"""
+    
+    <style>
+    #footer {{
+        visibility: hidden !important;
+    }}
+    
+    .block-container {{
+        padding-top: 8rem !important;
+    }}
+
+    /* Posicionamento padrão das logos */
+    .logo-esq, .logo-dir {{
+        position: fixed;
+        top: 60px;
+        z-index: 999;
+    }}
+    .logo-esq {{
+        left: 30px;
+        width: 75px;
+    }}
+    .logo-dir {{
+        right: 30px;
+        width: 150px;
+    }}
+
+    /* --- REGRAS DE ALTERNÂNCIA (LIGHT / DARK) --- */
+
+    /* Por padrão (Light Mode): exibe a versão light e esconde a dark */
+    .logo-light {{
+        display: block !important;
+    }}
+    .logo-dark {{
+        display: none !important;
+    }}
+
+    /* Quando o Streamlit estiver em Dark Mode: */
+    /* Abrange tanto a classe .stAppDarkTheme quanto os atributos de tema */
+    .stApp[data-theme="dark"] .logo-light,
+    .stApp[data-base-theme="dark"] .logo-light,
+    .stAppDarkTheme .logo-light,
+    [data-theme="dark"] .logo-light {{
+        display: none !important;
+    }}
+
+    .stApp[data-theme="dark"] .logo-dark,
+    .stApp[data-base-theme="dark"] .logo-dark,
+    .stAppDarkTheme .logo-dark,
+    [data-theme="dark"] .logo-dark {{
+        display: block !important;
+    }}
+    </style>
+    
+    <!-- Logos Esquerda (Light & Dark) -->
+    <img src="data:image/png;base64,{logo_svri_esq_b64_light}" class="logo-esq logo-light" alt="Logo SVRI Claro">
+    <img src="data:image/png;base64,{logo_svri_esq_b64_dark}" class="logo-esq logo-dark" alt="Logo SVRI Escuro">
+
+    <!-- Logos Direita (Light & Dark) -->
+    <img src="data:image/png;base64,{logo_prevtev_dir_b64}" class="logo-dir logo-light" alt="Logo PREVTEV Claro">
+    <img src="data:image/png;base64,{logo_prevtev_dir_b64}" class="logo-dir logo-dark" alt="Logo PREVTEV Escuro">
+    """,
+    unsafe_allow_html=True
+)
 
 
 def run_export() -> tuple[bool, str]:
