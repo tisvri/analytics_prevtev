@@ -96,55 +96,55 @@ def filtrar_medicos_unicos(df_usuarios: pd.DataFrame) -> pd.DataFrame:
     return df_medicos.drop_duplicates(subset="crmCpf", keep="first")
 
 
-def secao_lista_medicos(df_usuarios: pd.DataFrame) -> None:
-    st.header("3. Lista de Médicos")
+# def secao_lista_medicos(df_usuarios: pd.DataFrame) -> None:
+#     st.header("3. Lista de Médicos")
 
-    st.subheader("3.1 Médicos únicos (deduplicados por CRM/CPF)")
-    df_lista_medicos = filtrar_medicos_unicos(df_usuarios)
-    df_lista_medicos = df_lista_medicos.drop(columns=["user_id", "nomeCalculadora"])
-    df_lista_medicos = df_lista_medicos.rename(columns={
-        "nomeCompleto": "Nome Completo",
-        "email": "Email",
-        "profissionalSaude": "Profissional de Saúde",
-        "crmCpf": "CRM/CPF",
-        "preenchimento_dt": "Data de Preenchimento",
-    })
-    st.dataframe(df_lista_medicos, width="stretch")
+#     st.subheader("3.1 Médicos únicos (deduplicados por CRM/CPF)")
+#     df_lista_medicos = filtrar_medicos_unicos(df_usuarios)
+#     df_lista_medicos = df_lista_medicos.drop(columns=["user_id", "nomeCalculadora"])
+#     df_lista_medicos = df_lista_medicos.rename(columns={
+#         "nomeCompleto": "Nome Completo",
+#         "email": "Email",
+#         "profissionalSaude": "Profissional de Saúde",
+#         "crmCpf": "CRM/CPF",
+#         "preenchimento_dt": "Data de Preenchimento",
+#     })
+#     st.dataframe(df_lista_medicos, width="stretch")
 
-    buffer = BytesIO()
-    df_lista_medicos.to_excel(buffer, index=False)
-    st.download_button(
-        "Baixar lista de médicos (.xlsx)",
-        data=buffer.getvalue(),
-        file_name=f"lista_medicos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        key="download_medicos_unicos_sem_score",
-    )
+#     buffer = BytesIO()
+#     df_lista_medicos.to_excel(buffer, index=False)
+#     st.download_button(
+#         "Baixar lista de médicos (.xlsx)",
+#         data=buffer.getvalue(),
+#         file_name=f"lista_medicos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+#         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+#         key="download_medicos_unicos_sem_score",
+#     )
 
-    st.subheader("3.2 Todos os registros (sem exclusão de duplicatas)")
-    df_todos_registros = df_usuarios[
-        ["user_id", "nomeCompleto", "email", "profissionalSaude", "crmCpf", "nomeCalculadora", "preenchimento_dt"]
-    ].copy()
-    df_todos_registros = df_todos_registros.rename(columns={
-        "user_id": "Usuário",
-        "nomeCompleto": "Nome Completo",
-        "email": "Email",
-        "profissionalSaude": "Profissional de Saúde",
-        "crmCpf": "CRM/CPF",
-        "nomeCalculadora": "Score",
-        "preenchimento_dt": "Data de Preenchimento",
-    })
-    st.dataframe(df_todos_registros, width="stretch")
+#     st.subheader("3.2 Todos os registros (sem exclusão de duplicatas)")
+#     df_todos_registros = df_usuarios[
+#         ["user_id", "nomeCompleto", "email", "profissionalSaude", "crmCpf", "nomeCalculadora", "preenchimento_dt"]
+#     ].copy()
+#     df_todos_registros = df_todos_registros.rename(columns={
+#         "user_id": "Usuário",
+#         "nomeCompleto": "Nome Completo",
+#         "email": "Email",
+#         "profissionalSaude": "Profissional de Saúde",
+#         "crmCpf": "CRM/CPF",
+#         "nomeCalculadora": "Score",
+#         "preenchimento_dt": "Data de Preenchimento",
+#     })
+#     st.dataframe(df_todos_registros, width="stretch")
 
-    buffer_todos = BytesIO()
-    df_todos_registros.to_excel(buffer_todos, index=False)
-    st.download_button(
-        "Baixar todos os registros (.xlsx)",
-        data=buffer_todos.getvalue(),
-        file_name=f"todos_registros_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        key="download_todos_registros_sem_score",
-    )
+#     buffer_todos = BytesIO()
+#     df_todos_registros.to_excel(buffer_todos, index=False)
+#     st.download_button(
+#         "Baixar todos os registros (.xlsx)",
+#         data=buffer_todos.getvalue(),
+#         file_name=f"todos_registros_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+#         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+#         key="download_todos_registros_sem_score",
+#     )
 
 
 def secao_dataset_calculadoras(df_usuarios: pd.DataFrame) -> None:
@@ -263,7 +263,7 @@ def main() -> None:
 
     secao_analytics_gerais(df_usuarios)
     secao_dataset_calculadoras(df_usuarios)
-    secao_lista_medicos(df_usuarios)
+    # secao_lista_medicos(df_usuarios)
 
 
 if __name__ == "__main__":
